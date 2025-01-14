@@ -1,7 +1,6 @@
-# ikaganacar.com
+# ikaganacar.com - Main
 
 The source code of my personal website.
-
 
 ## Badges
 
