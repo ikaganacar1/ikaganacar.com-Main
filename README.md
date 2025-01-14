@@ -19,6 +19,7 @@ The source code of my personal website.
 This part of the website uses Matter.js, a 2D physics engine, to create an interactive and engaging experience. The "Useless Projects" button swings as if hanging, and the side buttons are draggable. Users can click to generate circles that move and bounce around, showcasing a dynamic and playful use of physics-based elements.
 
 The side buttons serve different purposes. The left-side buttons are for social links, providing quick access to platforms like Twitter, LinkedIn, and email. On the right, the buttons interact with the physics elements on the page. They allow users to change gravity, modify ball colors, delete balls, or activate a "party" mode, enhancing the interactive experience.
+![image](https://github.com/user-attachments/assets/4a510c5a-2fd0-4b3c-8464-5be6d89f74c6)
 
 ### Useless Projects
 This part of website is pretty much self-explaining :) Navigation page for my useless projects.
