@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='pages/admin/panel.css')}}">
+    
+    <script>
+        function toggleCollapse(element) {
+            const parentTr = element.closest('tr');
+            parentTr.classList.toggle('collapsed');
+        }
+    </script>
+</head>
+<body>
+
+    <form class="form" action="{{ url_for('panel')}}" method="POST">
+        
+        <p class="title">Add Admin</p>
+        <!--<p class="message">Signup now and get full access to our app. </p>
+        <p class="signin">Already have an acount ? <a href="#">Signin</a> </p>
+        -->
+        <div class="flex">
+            <label>
+                <input name="username" required="" placeholder="" type="text" class="input">
+                <span>Username</span>
+            </label>
+
+            <label>
+                <input name="password" required="" placeholder="" type="text" class="input">
+                <span>Password</span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label>
+                <input name="apartment_name" required="" placeholder="" type="text" class="input">
+                <span>Apartment Name</span>
+            </label>
+
+        </div>
+
+        <button class="submit" type="submit">Ekle</button>
+    </form>
+
+<h1>Page History</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Page Name</th>
+            <th>Visit Count</th>
+            <th>Visits</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for history in histories %}
+        <tr class="collapsed">
+            <td>{{ history.page_name }}</td>
+            <td>{{ history.visit_count }}</td>
+            <td>
+                <span class="collapse-toggle" onclick="toggleCollapse(this)">Show/Hide Visits</span>
+                <ul>
+                    {% for visit in history.visits %}
+                    <li>{{ visit.date }} - {{ visit.ip_address }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

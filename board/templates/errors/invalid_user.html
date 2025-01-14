@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% endblock header %}
+
+{% block div %}
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='errors/errors.css')}}">
+
+
+<div id="Error">
+    <h1>Oops!</h1>
+    <h2>Invalid User!</p>
+</div>
+
+<a href="/apartmanım">
+    <p>Click for return login..</p>
+</a>
+
+
+
+{% endblock div %}

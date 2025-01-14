@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}{% endblock title %}</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='image/favicon.ico') }}">
+        {% block header %}{% endblock header %}
+    </head>
+
+    <body>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        {% block div %}{% endblock div %}
+        
+
+    </body>                
+</html>
