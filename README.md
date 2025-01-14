@@ -2,6 +2,8 @@
 
 The source code of my personal website.
 
+Note: This repository is moved apart from ikaganacar.com repository. If you want to see how this project is created, you can still find all of the things you need at initial ikaganacar.com repo
+
 ## Badges
 
 ### Frontend
