@@ -1,4 +1,4 @@
-from board import db, login_manager
+from board import db
 from flask import request
 from datetime import datetime, date
 from sqlalchemy import func

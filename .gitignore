@@ -7,3 +7,4 @@ secret_key.txt
 __pycache__
 temp
 migrations
+flask_session
