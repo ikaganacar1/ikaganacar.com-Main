@@ -5,6 +5,8 @@ from flask_bcrypt import Bcrypt
 #from flask_login import LoginManager
 import os
 
+# TODO: SSL sertificate to make website HTTPS://
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
