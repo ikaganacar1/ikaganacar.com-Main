@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block div %}
 <link rel="stylesheet" href="{{ url_for('static', filename='test_page/test_background.css')}}">
 
@@ -13,8 +12,66 @@
 <script src="https://cdn.jsdelivr.net/npm/pathseg@1.2.1/pathseg.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js"></script>
 
-
+<div class="clappercontainer">
+    <div id="clapboard_sign">
+        
+        <div class="clapper__top rotateUp">
+            <div class="clapper__top--white"></div>
+            <div class="clapper__top--white"></div>
+            <div class="clapper__top--white"></div>
+            <div class="clapper__top--white"></div>
+            <div class="clapper__top--white"></div>
+        </div>
+        <div class="container">
+            <div class="clapper__bottom">
+                <div class="clapper__bottom--white"></div>
+                <div class="clapper__bottom--white"></div>
+                <div class="clapper__bottom--white"></div>
+                <div class="clapper__bottom--white"></div>
+                <div class="clapper__bottom--white"></div>
+            </div>
+            <div class="info-container">
+                <div class="scene-take-roll">
+                    <div class="scene">
+                        <p class="text"></p>
+                        <p class="scene__text"></p>
+                    </div>
+                    <div class="take">
+                        <p class="text"></p>
+                        <p class="take__text"></p>
+                    </div>
+                    <div class="roll">
+                        <p class="text"></p>
+                        <p class="roll__text"></p>
+                    </div>
+                </div>
+                <div class="date-prod-sound">
+                    <div class="date-prod">
+                        <div class="date">
+                            <p class="text text--padded"></p>
+                            <p class="date__text"></p>
+                        </div>
+                        <div class="prod">
+                            <p class="text text--padded"></p>
+                        </div>
+                    </div>
+                    <div class="sound">
+                        <p class="text text--padded"></p>
+                    </div>
+                </div>
+                <div class="director">
+                    <p class="text text--padded"></p>
+                </div>
+                <div class="cinematographer">
+                    <p class="text text--padded"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="clapboard_link" class="link">
+        <p id="clapboard_link_p"></p>
+    </div>
+</div>
 
 <script src="{{ url_for('static', filename='test_page/test_scripts.js')}}"></script>
-
 {% endblock div %}
