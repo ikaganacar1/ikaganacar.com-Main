@@ -22,6 +22,9 @@ def howmuchmoneyleft():
 def ika():
     return render_template("useless_projects/ika.html")
 
+@app.route("/useless_projects/braindead_reddot")
+def reddot():
+    return render_template("useless_projects/braindead_reddot.html")
 
 #? Lot more Useless:
 @app.route("/hearts8")
