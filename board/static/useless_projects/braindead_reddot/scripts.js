@@ -1,61 +1,3 @@
-/*
-  ____ ___  _   _ _____ ___ ____
- / ___/ _ \| \ | |  ___|_ _/ ___|
-| |  | | | |  \| | |_   | | |  _
-| |__| |_| | |\  |  _|  | | |_| |
- \____\___/|_| \_|_|   |___\____|
-
-*/
-
-const Config = {
-  world:{
-    gravity:1
-
-  },
-
-  container_circle: {
-    centerX: window.innerWidth /2,
-    centerY: window.innerHeight /2,
-    radius:200,
-    wallThickness:30,
-    numSegments:30,
-    color: "white",
-
-    is_rotating:true,
-    rotation_speed:0.002,
-
-  },
-
-  smallBall: {
-    //Body
-    X:window.innerWidth/2,
-    Y:window.innerHeight/2,
-    radius:30,
-    restitution:1.03,
-    friction:0,
-    frictionAir:0.0001,
-    color:'red',
-    initial_force:{ x: 0.05, y: -0.05 },
-    
-    //Camera 
-    camera_focus:false,
-    
-    //Modes 
-    allow_multiple_balls_on_click:true, 
-
-    grow_on_collision:false,
-    growth_scale:1.05, 
-    
-    new_ball_on_collision:false,
-    
-    paint_on_collision:true,
-    clear_the_scene:true,
-    destroy_if_all_red:false,
-    destroy_where_touched:true,
-
-  }
-}
-
 
 /*
   ____ ___  _   _ ____ _____
@@ -178,49 +120,122 @@ function beep() {
 |_|  |_/_/   \_\___|_| \_|
 
 */
-try {
 
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelector("button[type=submit]").addEventListener("click", function (event) {
+    event.preventDefault();
 
+    const form = document.getElementById("hide");
+    form.style.display = "none";
+
+    // Update the Config object
+    const inputs = document.querySelectorAll("input");
+
+    function updateConfig(obj, path, value) {
+      const keys = path.split(".");
+      let current = obj;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+    }
+
+    inputs.forEach(input => {
+      const keyPath = input.dataset.configKey;
+      const type = input.dataset.configType;
+      let value;
+
+      // Parse input value based on type
+      if (type === "boolean") {
+        value = input.checked;
+      } else if (type === "number") {
+        value = parseFloat(input.value);
+      } else {
+        value = input.value;
+      }
+
+      updateConfig(Config, keyPath, value);
+    });
+
+    if (Config.world.custom_window_size) {
+      Config.container_circle.centerX = Config.world.window_size_x / 2;
+      Config.container_circle.centerY = Config.world.window_size_y / 2;
+      Config.smallBall.X = Config.world.window_size_x / 2;
+      Config.smallBall.Y = Config.world.window_size_y / 2;
+    }
+
+    resetSimulation();
+
+
+  });
+
+  function resetSimulation() {
+    if (typeof engine !== "undefined" && typeof render !== "undefined") {
+      World.clear(engine.world, false);
+      Engine.clear(engine);
+      Render.stop(render);
+      render.canvas.remove();
+    }
+
+    initializeSimulation();
+  }
+
+  function initializeSimulation() {
     const render = Render.create({
       element: document.body,
       engine: engine,
       options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: Config.world.window_size_x,
+        height: Config.world.window_size_y,
         wireframes: false,
         background: 'black',
       }
     });
     render.options.hasBounds = true;
-    document.body.appendChild(render.canvas);
+    document.getElementById("matter_column").appendChild(render.canvas);
 
     var static_circle_elems = static_circle();
-    var second_layer = static_circle(
-      centerX = Config.container_circle.centerX ,
-      centerY = Config.container_circle.centerY,
-      radius=Config.container_circle.radius * 1.5,
-      wallThickness=Config.container_circle.wallThickness,
-      numSegments=Config.container_circle.numSegments *1.5,
-      rotation_speed=-Config.container_circle.rotation_speed,
-      is_rotating=Config.container_circle.is_rotating,
-      color=Config.container_circle.color,
-    );
+    var last_layer = static_circle_elems;
+    var growth_radius = Config.smallBall.radius;
+    if (Config.container_circle.create_second_layer) {
 
-    var third_layer= static_circle(
-      centerX = Config.container_circle.centerX ,
-      centerY = Config.container_circle.centerY,
-      radius=Config.container_circle.radius * 1.95,
-      wallThickness=Config.container_circle.wallThickness,
-      numSegments=Config.container_circle.numSegments *2,
-      rotation_speed=Config.container_circle.rotation_speed,
-      is_rotating=Config.container_circle.is_rotating,
-      color=Config.container_circle.color,
-    );
+      var second_layer = static_circle(
+        centerX = Config.container_circle.centerX ,
+        centerY = Config.container_circle.centerY,
+        radius=Config.container_circle.radius * 1.5,
+        wallThickness=Config.container_circle.wallThickness,
+        numSegments=Config.container_circle.numSegments *1.5,
+        rotation_speed=-Config.container_circle.rotation_speed,
+        is_rotating=Config.container_circle.is_rotating,
+        color=Config.container_circle.color,
+      );
+      last_layer = second_layer;
+      var growth_radius = Config.container_circle.radius * 1.5;
 
 
+    } else {
+      var second_layer = [];
+    }
+    
+    if (Config.container_circle.create_third_layer) {
+      
+      var third_layer= static_circle(
+        centerX = Config.container_circle.centerX ,
+        centerY = Config.container_circle.centerY,
+        radius=Config.container_circle.radius * 1.95,
+        wallThickness=Config.container_circle.wallThickness,
+        numSegments=Config.container_circle.numSegments *2,
+        rotation_speed=Config.container_circle.rotation_speed,
+        is_rotating=Config.container_circle.is_rotating,
+        color=Config.container_circle.color,
+      );
+      last_layer = third_layer;
+      var growth_radius = Config.container_circle.radius * 1.95;
 
-
+    } else {
+      var third_layer = [];
+    }
+    
 
     var ball_list = [];
     var beep_list = [];
@@ -228,27 +243,27 @@ try {
     document.addEventListener("click", () => {
       smallBall = create_ball();
       ball_list.push(smallBall);
-      
+
       Body.applyForce(smallBall, smallBall.position, Config.smallBall.initial_force);
 
     }, { once: !Config.smallBall.allow_multiple_balls_on_click});
 
-    
+
     let hasCollided = false;
     Events.on(engine, 'collisionStart', function (event) {
       event.pairs.forEach(pair => {
-        
+
         b=beep();
         beep_list.push(b);
-        
+
         //Paint on Collision Mode
         if (Config.smallBall.paint_on_collision) {
-          
+
           if (Config.smallBall.destroy_where_touched){
-            if (ball_list.includes(pair.bodyA) && !(third_layer.includes(pair.bodyB )) && !(ball_list.includes(pair.bodyB))  ) {
+            if (ball_list.includes(pair.bodyA) && !(last_layer.includes(pair.bodyB )) && !(ball_list.includes(pair.bodyB))  ) {
               World.remove(world, pair.bodyB);
             }
-            else if (ball_list.includes(pair.bodyB)  && !(third_layer.includes(pair.bodyA)) && !(ball_list.includes(pair.bodyA)) ){
+            else if ((ball_list.includes(pair.bodyB))  && !(last_layer.includes(pair.bodyA)) && !(ball_list.includes(pair.bodyA)) ){
               World.remove(world, pair.bodyA);
             }
 
@@ -261,37 +276,15 @@ try {
             pair.bodyA.render.fillStyle = "rgb(255,0,0)";//`rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`
           }
 
-          let there_is_still_white_layer1 = false;
-          static_circle_elems.forEach(element => {
-            if (element.render.fillStyle == "white") {
-              there_is_still_white_layer1 = true;
+           
+          
+          const allPainted = [static_circle_elems, second_layer, third_layer].every(layer =>
+            layer.every(element => element.render.fillStyle !== "white")
+          );
 
-            }
-
-          });
-
-          let there_is_still_white_layer2 = false;
-          second_layer.forEach(element => {
-            if (element.render.fillStyle == "white") {
-              there_is_still_white_layer2 = true;
-
-            }
-
-          });
-
-
-          let there_is_still_white_layer3 = false;
-          third_layer.forEach(element => {
-            if (element.render.fillStyle == "white") {
-              there_is_still_white_layer3 = true;
-
-            }
-
-          });
-
-
+        
           //Clears the scene
-          if (there_is_still_white_layer3 == false && Config.smallBall.clear_the_scene == true){
+          if (allPainted == true && Config.smallBall.clear_the_scene == true){
 
             ball_list.forEach(element => {
               World.remove(world,element);
@@ -301,32 +294,28 @@ try {
               element.pause();
             });
 
-            third_layer.forEach(element => {
+            last_layer.forEach(element => {
               element.render.fillStyle = 'white';
             });
           }
 
-          if (there_is_still_white_layer1 == false && Config.smallBall.destroy_if_all_red == true) {
+          if (allPainted == false && Config.smallBall.destroy_if_all_red == true) {
             static_circle_elems.forEach(element => {
               World.remove(world,element)
             });
 
-            if (there_is_still_white_layer2 == false) {
-              second_layer.forEach(element => {
+
+            second_layer.forEach(element => {
               World.remove(world,element)
             });
-              
-            }
 
           }
-
         }
-          
 
 
         if (pair.bodyA === smallBall || pair.bodyB === smallBall) {
           if (!hasCollided) {
-            
+
             //New ball on collision mode (not working so great :/ )
             if (Config.smallBall.new_ball_on_collision == true){
               new_ball = create_ball();
@@ -337,12 +326,12 @@ try {
 
             //Grow on collision Mode
             if (Config.smallBall.grow_on_collision == true){
-              if (smallBall.area < /*took pi 3 to make it slightly small*/3*(200*200) ) { 
+              if (smallBall.area < 3*(growth_radius*growth_radius) ) {//it is buggy (growth radius check dont work!) 
                 Body.scale(smallBall, Config.smallBall.growth_scale, Config.smallBall.growth_scale);
+                console.log("a");
+
               }
             }
-
-
 
             hasCollided = true;
           }
@@ -357,7 +346,6 @@ try {
         }
       });
     });
-
 
     Events.on(engine, 'afterUpdate', function() {
       if (typeof smallBall !== 'undefined' && Config.smallBall.camera_focus) {
@@ -374,8 +362,5 @@ try {
     const runner = Runner.create();
     Runner.run(runner, engine);
 
-
-  });
-} catch (error) {
-  console.log(error)
-}
+  }
+});
