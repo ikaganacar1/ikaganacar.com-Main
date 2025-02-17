@@ -9,7 +9,7 @@
 var Config = {
   world: {
     gravity: 1,
-    custom_window_size: true,
+    custom_window_size: false,
     window_size_x: 1000,
     window_size_y: 1000,
   },
@@ -27,8 +27,15 @@ var Config = {
     create_third_layer:true,
   },
 
+  camera: {
+    camera_focus: false,
+  },
+  
+  sound: {
+    beep_on_collision:true,
+  },
+
   smallBall: {
-    // Body
     X: window.innerWidth / 2,
     Y: window.innerHeight / 2,
     radius: 30,
@@ -38,25 +45,26 @@ var Config = {
     color: 'red',
     initial_force: { x: 0.05, y: -0.05 },
 
-    // Camera
-    camera_focus: false,
-
-    // Modes
+  },
+  
+  mode: {
     allow_multiple_balls_on_click: true,
     grow_on_collision: false,
     growth_scale: 1.05,
     new_ball_on_collision: false,
     paint_on_collision: true,
+    paint_random_color: false,
+    paint_color:"rgb(255,0,0)",
     clear_the_scene: true,
     destroy_if_all_red: false,
     destroy_where_touched: true,
-  }
+  },
+
 };
 
 document.addEventListener("DOMContentLoaded", function () {
   const configForm = document.getElementById("configForm");
 
-  // Helper function to create an input element
   function createInput(name, value, path = "") {
     const label = document.createElement("label");
     label.textContent = name + ": ";
@@ -68,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       input.value = value;
     }
-    input.dataset.configKey = path ? `${path}.${name}` : name; // Include full path
-    input.dataset.configType = typeof value; // Store the expected type
+    input.dataset.configKey = path ? `${path}.${name}` : name; 
+    input.dataset.configType = typeof value; 
 
     const container = document.createElement("div");
     container.appendChild(label);
@@ -77,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return container;
   }
 
-  // Helper function to create a collapsible section
   function createCollapsibleSection(title, content) {
     const section = document.createElement("div");
     section.classList.add("config-section");
@@ -99,19 +106,17 @@ document.addEventListener("DOMContentLoaded", function () {
     return section;
   }
 
-  // Recursively generate the form
   function generateForm(config, parentElement, path = "") {
     for (const key in config) {
       if (typeof config[key] === "object" && config[key] !== null) {
         const subContainer = document.createElement("div");
-        generateForm(config[key], subContainer, path ? `${path}.${key}` : key); // Pass updated path
+        generateForm(config[key], subContainer, path ? `${path}.${key}` : key); 
         parentElement.appendChild(createCollapsibleSection(key, subContainer));
       } else {
-        parentElement.appendChild(createInput(key, config[key], path)); // Pass current path
+        parentElement.appendChild(createInput(key, config[key], path)); 
       }
     }
   }
 
-  // Generate the form
   generateForm(Config, configForm);
 });

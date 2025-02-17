@@ -128,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("hide");
     form.style.display = "none";
 
-    // Update the Config object
     const inputs = document.querySelectorAll("input");
 
     function updateConfig(obj, path, value) {
@@ -145,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const type = input.dataset.configType;
       let value;
 
-      // Parse input value based on type
       if (type === "boolean") {
         value = input.checked;
       } else if (type === "number") {
@@ -162,6 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
       Config.container_circle.centerY = Config.world.window_size_y / 2;
       Config.smallBall.X = Config.world.window_size_x / 2;
       Config.smallBall.Y = Config.world.window_size_y / 2;
+    } 
+    else {
+      Config.world.window_size_x = window.innerWidth;
+      Config.world.window_size_y = window.innerHeight;
     }
 
     resetSimulation();
@@ -246,20 +248,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
       Body.applyForce(smallBall, smallBall.position, Config.smallBall.initial_force);
 
-    }, { once: !Config.smallBall.allow_multiple_balls_on_click});
+    }, { once: !Config.mode.allow_multiple_balls_on_click});
 
 
     let hasCollided = false;
     Events.on(engine, 'collisionStart', function (event) {
       event.pairs.forEach(pair => {
-
-        b=beep();
-        beep_list.push(b);
+        
+        if (Config.sound.beep_on_collision) {
+          b=beep();
+          beep_list.push(b); 
+        }
 
         //Paint on Collision Mode
-        if (Config.smallBall.paint_on_collision) {
+        if (Config.mode.paint_on_collision) {
 
-          if (Config.smallBall.destroy_where_touched){
+          if (Config.mode.destroy_where_touched){
             if (ball_list.includes(pair.bodyA) && !(last_layer.includes(pair.bodyB )) && !(ball_list.includes(pair.bodyB))  ) {
               World.remove(world, pair.bodyB);
             }
@@ -269,12 +273,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
           }
 
-          if (pair.bodyA === smallBall) {
-            pair.bodyB.render.fillStyle = "rgb(255,0,0)";//`rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`
+          if (pair.bodyA === smallBall && !(Config.mode.paint_random_color)) {
+            pair.bodyB.render.fillStyle = Config.mode.paint_color;
           }
-          else {
-            pair.bodyA.render.fillStyle = "rgb(255,0,0)";//`rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`
+          else if (pair.bodyB === smallBall && !(Config.mode.paint_random_color)) {
+            pair.bodyA.render.fillStyle =  Config.mode.paint_color;
           }
+          
+          if (pair.bodyA === smallBall && (Config.mode.paint_random_color)) {
+            pair.bodyB.render.fillStyle = `rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`;
+          }
+          else if (pair.bodyB === smallBall && (Config.mode.paint_random_color)) {
+            pair.bodyA.render.fillStyle = `rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`;
+          }
+
+
 
            
           
@@ -284,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         
           //Clears the scene
-          if (allPainted == true && Config.smallBall.clear_the_scene == true){
+          if (allPainted == true && Config.mode.clear_the_scene == true){
 
             ball_list.forEach(element => {
               World.remove(world,element);
@@ -299,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           }
 
-          if (allPainted == false && Config.smallBall.destroy_if_all_red == true) {
+          if (allPainted == false && Config.mode.destroy_if_all_red == true) {
             static_circle_elems.forEach(element => {
               World.remove(world,element)
             });
@@ -317,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!hasCollided) {
 
             //New ball on collision mode (not working so great :/ )
-            if (Config.smallBall.new_ball_on_collision == true){
+            if (Config.mode.new_ball_on_collision == true){
               new_ball = create_ball();
               Body.applyForce(new_ball, new_ball.position, { x: 0.01, y: -0.01 });
 
@@ -325,9 +338,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             //Grow on collision Mode
-            if (Config.smallBall.grow_on_collision == true){
+            if (Config.mode.grow_on_collision == true){
               if (smallBall.area < 3*(growth_radius*growth_radius) ) {//it is buggy (growth radius check dont work!) 
-                Body.scale(smallBall, Config.smallBall.growth_scale, Config.smallBall.growth_scale);
+                Body.scale(smallBall, Config.mode.growth_scale, Config.mode.growth_scale);
                 console.log("a");
 
               }
@@ -348,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     Events.on(engine, 'afterUpdate', function() {
-      if (typeof smallBall !== 'undefined' && Config.smallBall.camera_focus) {
+      if (typeof smallBall !== 'undefined' && Config.camera.camera_focus) {
 
         const targetX = smallBall.position.x - render.options.width / 2;
         const targetY = smallBall.position.y - render.options.height / 2;
