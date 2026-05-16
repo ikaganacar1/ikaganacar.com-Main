@@ -1,4 +1,5 @@
 from flask import (
+    abort,
     render_template,
 
 )
@@ -25,4 +26,4 @@ def error_invalid_user():
 
 @app.route("/custom_error/<error>")
 def custom_error(error):
-    return render_template("errors/custom_error.html",error=error)
+    abort(404)

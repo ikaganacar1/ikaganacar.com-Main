@@ -29,14 +29,29 @@ try {
     options: {
       width: window.innerWidth,
       height: window.innerHeight,
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       wireframes: false,
       background: 'transparent',
       wireframeBackground: 'transparent'
       //showAngleIndicator: true,
     }
   })
-  Render.run(iRender)
-  Runner.run(iRunner, iEngine)
+  let matterActive = false
+  function startMatter () {
+    if (matterActive) return
+    Render.run(iRender)
+    Runner.run(iRunner, iEngine)
+    matterActive = true
+  }
+
+  function stopMatter () {
+    if (!matterActive) return
+    Render.stop(iRender)
+    Runner.stop(iRunner)
+    matterActive = false
+  }
+
+  startMatter()
 
   let mouse = Mouse.create(iRender.canvas)
   let mouseConstraint = Matter.MouseConstraint.create(iEngine, {
@@ -50,6 +65,25 @@ try {
   })
   Matter.World.add(world, mouseConstraint)
   iRender.mouse = mouse
+
+  function releaseMouseConstraint () {
+    mouse.button = -1
+    mouseConstraint.bodyB = null
+    mouseConstraint.constraint.bodyB = null
+    mouseConstraint.constraint.pointB = { x: 0, y: 0 }
+  }
+
+  window.addEventListener('pageshow', releaseMouseConstraint)
+  window.addEventListener('pagehide', releaseMouseConstraint)
+  window.addEventListener('blur', releaseMouseConstraint)
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      releaseMouseConstraint()
+      stopMatter()
+    } else {
+      startMatter()
+    }
+  })
 
   function create_walls () {
     const wall_bottom = Bodies.rectangle(
@@ -91,7 +125,6 @@ try {
   if (ratio < 1) {
     ratio = 1
   }
-  console.log(ratio)
 
   function create_page_sign (
     sign_tag,
@@ -336,7 +369,7 @@ try {
       }
     )
 
-    apartment_body = Body.create({
+    const apartment_body = Body.create({
       parts: [
         building,
         window1,
@@ -390,61 +423,74 @@ try {
     return [apartment_body, link_button]
   }
 
-  apartment = create_apartment_page_sign(
-    (link_tag = 'apartment_link'),
-    (link = 'apartmanim'),
-    (link_x = 300),
-    (link_y = window.innerHeight * 0.8)
+  const apartment = create_apartment_page_sign(
+    'apartment_link',
+    'apartmanim',
+    300,
+    window.innerHeight * 0.8
   )
 
-  money = create_page_sign(
+  const money = create_page_sign(
     //how much money left sign
-    (sign_tag = 'howmuchmoneyleft_sign'),
-    (link_tag = 'howmuchmoneyleft_link'),
-    (link = 'useless_projects/howmuchmoneyleft'),
+    'howmuchmoneyleft_sign',
+    'howmuchmoneyleft_link',
+    'useless_projects/howmuchmoneyleft',
 
-    (sign_x = window.innerWidth / 2),
-    (sign_y = window.innerHeight * 0.8),
-    (link_x = window.innerWidth / 2),
-    (link_y = window.innerHeight * 0.83)
+    window.innerWidth / 2,
+    window.innerHeight * 0.8,
+    window.innerWidth / 2,
+    window.innerHeight * 0.83
   )
 
-  balloon = create_page_sign(
+  const balloon = create_page_sign(
     //balloon sign
-    (sign_tag = 'balloon_sign'),
-    (link_tag = 'balloon_link'),
-    (link = 'useless_projects/balloons'),
+    'balloon_sign',
+    'balloon_link',
+    'useless_projects/balloons',
 
-    (sign_x = window.innerWidth / 2),
-    (sign_y = window.innerHeight * 0.3),
-    (link_x = window.innerWidth / 2),
-    (link_y = window.innerHeight * 0.33)
+    window.innerWidth / 2,
+    window.innerHeight * 0.3,
+    window.innerWidth / 2,
+    window.innerHeight * 0.33
   )
 
-  ika = create_page_sign(
+  const ika = create_page_sign(
     //ika
-    (sign_tag = 'ika_sign'),
-    (link_tag = 'ika_link'),
-    (link = 'useless_projects/ika'),
+    'ika_sign',
+    'ika_link',
+    'useless_projects/ika',
 
-    (sign_x = window.innerWidth / 2),
-    (sign_y = window.innerHeight * 0.5),
-    (link_x = window.innerWidth / 2 + 50),
-    (link_y = window.innerHeight * 0.53),
-    (isLinked = false)
+    window.innerWidth / 2,
+    window.innerHeight * 0.5,
+    window.innerWidth / 2 + 50,
+    window.innerHeight * 0.53,
+    false
   )
 
-  donation = create_page_sign(
-    (sign_tag = 'donation_sign'),
-    (link_tag = 'donation_link'),
-    (link = 'donation'),
+  const donation = create_page_sign(
+    'donation_sign',
+    'donation_link',
+    'donation',
 
-    (sign_x = window.innerWidth - 100),
-    (sign_y = window.innerHeight * 0.5),
-    (link_x = window.innerWidth - 150),
-    (link_y = window.innerHeight * 0.47),
-    (isLinked = true),
-    (sign_ratio = 0.4)
+    window.innerWidth - 100,
+    window.innerHeight * 0.5,
+    window.innerWidth - 150,
+    window.innerHeight * 0.47,
+    true,
+    0.4
+  )
+
+  const reddot = create_page_sign(
+    'reddot_sign',
+    'reddot_link',
+    'useless_projects/braindead_reddot',
+
+    window.innerWidth * 0.72,
+    window.innerHeight * 0.17,
+    window.innerWidth * 0.72,
+    window.innerHeight * 0.2,
+    true,
+    0.55
   )
 
   ;(function rerender () {
@@ -460,9 +506,11 @@ try {
     donation[0].render()
     donation[1].render()
 
+    reddot[0].render()
+    reddot[1].render()
+
     apartment[1].render()
 
-    Matter.Engine.update(iEngine)
     requestAnimationFrame(rerender)
   })()
 
@@ -560,7 +608,7 @@ try {
     var force = 0.00004
   }
 
-  balloon_list = []
+  const balloon_list = []
   for (let _ = 0; _ < 2; _++) {
     balloon_list.push(
       create_balloons(
@@ -644,7 +692,7 @@ try {
     }
 
     const head = Bodies.circle(x, y - 70, 30, headOptions)
-    chest = Bodies.rectangle(x, y, 60, 80, chestOptions)
+    const chest = Bodies.rectangle(x, y, 60, 80, chestOptions)
     chest.size = 40 // To determine overlap of goal
     const rightUpperArm = Bodies.rectangle(
       x + 40,
@@ -956,7 +1004,7 @@ try {
     }
   }
 
-  ragdoll = createRagdoll(window.innerWidth / 2, window.innerHeight * 0.62)
+  const ragdoll = createRagdoll(window.innerWidth / 2, window.innerHeight * 0.62)
   Composite.add(world, ragdoll)
 
   rope_link_to_obj(
@@ -987,7 +1035,7 @@ try {
       balloon_list[i].force.y -= balloon_list[i].mass * force
     }
 
-    apartment_body.force.y += 0.05
+    apartment[0].force.y += 0.05
   })
 
   Events.on(mouseConstraint, 'mousedown', function (event) {
@@ -995,10 +1043,11 @@ try {
     var bodies = world.bodies
 
     if (!mc.bodyB) {
-      for (i = 0; i < bodies.length; i++) {
+      for (let i = 0; i < bodies.length; i++) {
         var body = bodies[i]
         if (Matter.Bounds.contains(body.bounds, mc.mouse.position)) {
           if (body.url != undefined) {
+            releaseMouseConstraint()
             window.open(body.url, '_self')
             check_if_clicked = false
           }
@@ -1009,5 +1058,5 @@ try {
     }
   })
 } catch (e) {
-  console.log(e)
+  console.error(e)
 } //global try catch to see the errors on browser console

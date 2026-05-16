@@ -69,6 +69,8 @@ h2 {
   background: transparent;
   border: none;
   position: relative;
+  cursor: pointer;
+  font: inherit;
 }
 
 .block-cube {

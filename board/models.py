@@ -1,9 +1,7 @@
 from board import db
 from flask import request
-from datetime import datetime, date
-from sqlalchemy import func
+from datetime import datetime
 from flask_login import UserMixin
-from hashlib import sha256
 
 #Visint counting system cancelled for now
 class History(db.Model):
@@ -23,8 +21,8 @@ class History(db.Model):
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    date = db.Column(db.DateTime, nullable=False, default=datetime.now(), index=True)
-    ip_address = db.Column(db.String(100), nullable=False, default=lambda: request.environ["REMOTE_ADDR"])
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+    ip_address = db.Column(db.String(100), nullable=False, default=lambda: request.environ.get("REMOTE_ADDR", ""))
     history_id = db.Column(db.Integer, db.ForeignKey("history.id"), nullable=False)
 
     def __repr__(self) -> str:

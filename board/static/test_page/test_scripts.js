@@ -31,14 +31,29 @@ try {
     options: {
       width: window.innerWidth,
       height: window.innerHeight,
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       wireframes: false,
       background: "transparent",
       wireframeBackground: "transparent",
       //showAngleIndicator: true,
     },
   });
-  Render.run(iRender);
-  Runner.run(iRunner, iEngine);
+  let matterActive = false;
+  function startMatter() {
+    if (matterActive) return;
+    Render.run(iRender);
+    Runner.run(iRunner, iEngine);
+    matterActive = true;
+  }
+
+  function stopMatter() {
+    if (!matterActive) return;
+    Render.stop(iRender);
+    Runner.stop(iRunner);
+    matterActive = false;
+  }
+
+  startMatter();
 
   let mouse = Mouse.create(iRender.canvas);
   let mouseConstraint = Matter.MouseConstraint.create(iEngine, {
@@ -52,6 +67,25 @@ try {
   });
   Matter.World.add(world, mouseConstraint);
   iRender.mouse = mouse;
+
+  function releaseMouseConstraint() {
+    mouse.button = -1;
+    mouseConstraint.bodyB = null;
+    mouseConstraint.constraint.bodyB = null;
+    mouseConstraint.constraint.pointB = { x: 0, y: 0 };
+  }
+
+  window.addEventListener("pageshow", releaseMouseConstraint);
+  window.addEventListener("pagehide", releaseMouseConstraint);
+  window.addEventListener("blur", releaseMouseConstraint);
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      releaseMouseConstraint();
+      stopMatter();
+    } else {
+      startMatter();
+    }
+  });
 
   function create_walls() {
     const wall_bottom = Bodies.rectangle(
@@ -93,7 +127,6 @@ try {
   if (ratio < 1) {
     ratio = 1;
   }
-  console.log(ratio);
 
   function create_clapboard_sign(x, y, link_tag, link) {
     const board_w = ratio > 1 ? 200 : 150;
@@ -186,7 +219,7 @@ try {
     return [clapboard, link_button];
   }
 
-  clapboard = create_clapboard_sign(
+  const clapboard = create_clapboard_sign(
     window.innerWidth * 0.7, // x position
     window.innerHeight * 0.4, // y position
     "clapboard_link", // link tag
@@ -198,12 +231,11 @@ try {
     clapboard[0].render();
     clapboard[1].render();
 
-    Matter.Engine.update(iEngine);
     requestAnimationFrame(rerender);
   })();
 
   window.addEventListener('resize', () => {
-    Render.setPixelRatio(iRender, window.devicePixelRatio);
+    Render.setPixelRatio(iRender, Math.min(window.devicePixelRatio || 1, 2));
     Render.setSize(iRender, window.innerWidth, window.innerHeight);
 });
 
@@ -212,10 +244,11 @@ try {
     var bodies = world.bodies;
 
     if (!mc.bodyB) {
-      for (i = 0; i < bodies.length; i++) {
+      for (let i = 0; i < bodies.length; i++) {
         var body = bodies[i];
         if (Matter.Bounds.contains(body.bounds, mc.mouse.position)) {
           if (body.url != undefined) {
+            releaseMouseConstraint();
             window.open(body.url, "_self");
             check_if_clicked = false;
           }
@@ -226,5 +259,5 @@ try {
     }
   });
 } catch (e) {
-  console.log(e);
+  console.error(e);
 } //global try catch to see the errors on browser console

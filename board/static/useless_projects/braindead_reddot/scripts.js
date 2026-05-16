@@ -15,7 +15,7 @@ const Engine = Matter.Engine,
       Bounds = Matter.Bounds,
       Events = Matter.Events,
       Common = Matter.Common,
-      Vector = Matter.Vector
+      Vector = Matter.Vector,
       Composite = Matter.Composite,
       World = Matter.World,
       Body = Matter.Body,
@@ -23,6 +23,15 @@ const Engine = Matter.Engine,
 
 const engine = Engine.create({ gravity: { y: Config.world.gravity } });
 const world = engine.world;
+let render = null;
+let runner = null;
+let smallBall = null;
+let clickHandler = null;
+let collisionStartHandler = null;
+let collisionEndHandler = null;
+let afterUpdateHandler = null;
+let rotationStops = [];
+let matterActive = false;
 
 
 
@@ -65,6 +74,8 @@ function static_circle(
   World.add(world, [...ringBodies]);
 
 
+  let frameId = null;
+
   function rotate() {
     for (let i = 0; i < ringBodies.length; i++) {
       angles[i] += rotation_speed;
@@ -72,11 +83,12 @@ function static_circle(
       const newY = centerY + Math.sin(angles[i]) * radius;
       Body.setPosition(ringBodies[i], { x: newX, y: newY });
     }
-    requestAnimationFrame(rotate);
+    frameId = requestAnimationFrame(rotate);
   }
 
   if (is_rotating) {
-    rotate();
+    frameId = requestAnimationFrame(rotate);
+    rotationStops.push(() => cancelAnimationFrame(frameId));
   }
 
   return(ringBodies);
@@ -112,6 +124,20 @@ function beep() {
   return(snd);
 }
 
+function startMatter() {
+  if (matterActive || !render || !runner) return;
+  Render.run(render);
+  Runner.run(runner, engine);
+  matterActive = true;
+}
+
+function stopMatter() {
+  if (!matterActive) return;
+  if (render) Render.stop(render);
+  if (runner) Runner.stop(runner);
+  matterActive = false;
+}
+
 /*
  __  __    _    ___ _   _
 |  \/  |  / \  |_ _| \ | |
@@ -122,12 +148,22 @@ function beep() {
 */
 
 document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      stopMatter();
+    } else {
+      startMatter();
+    }
+  });
+
   document.querySelector("button[type=submit]").addEventListener("click", function (event) {
     event.preventDefault();
+    event.stopPropagation();
 
     const form = document.getElementById("hide");
     form.style.display = "none";
 
+    // Update the Config object
     const inputs = document.querySelectorAll("input");
 
     function updateConfig(obj, path, value) {
@@ -144,6 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const type = input.dataset.configType;
       let value;
 
+      // Parse input value based on type
       if (type === "boolean") {
         value = input.checked;
       } else if (type === "number") {
@@ -160,10 +197,13 @@ document.addEventListener("DOMContentLoaded", () => {
       Config.container_circle.centerY = Config.world.window_size_y / 2;
       Config.smallBall.X = Config.world.window_size_x / 2;
       Config.smallBall.Y = Config.world.window_size_y / 2;
-    } 
-    else {
+    } else {
       Config.world.window_size_x = window.innerWidth;
       Config.world.window_size_y = window.innerHeight;
+      Config.container_circle.centerX = Config.world.window_size_x / 2;
+      Config.container_circle.centerY = Config.world.window_size_y / 2;
+      Config.smallBall.X = Config.world.window_size_x / 2;
+      Config.smallBall.Y = Config.world.window_size_y / 2;
     }
 
     resetSimulation();
@@ -172,23 +212,55 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function resetSimulation() {
-    if (typeof engine !== "undefined" && typeof render !== "undefined") {
+    if (render) {
       World.clear(engine.world, false);
       Engine.clear(engine);
       Render.stop(render);
       render.canvas.remove();
+      render = null;
     }
 
+    if (runner) {
+      Runner.stop(runner);
+      runner = null;
+    }
+    matterActive = false;
+
+    rotationStops.forEach(stop => stop());
+    rotationStops = [];
+
+    if (clickHandler) {
+      document.removeEventListener("click", clickHandler);
+      clickHandler = null;
+    }
+
+    if (collisionStartHandler) {
+      Events.off(engine, "collisionStart", collisionStartHandler);
+      collisionStartHandler = null;
+    }
+
+    if (collisionEndHandler) {
+      Events.off(engine, "collisionEnd", collisionEndHandler);
+      collisionEndHandler = null;
+    }
+
+    if (afterUpdateHandler) {
+      Events.off(engine, "afterUpdate", afterUpdateHandler);
+      afterUpdateHandler = null;
+    }
+
+    smallBall = null;
     initializeSimulation();
   }
 
   function initializeSimulation() {
-    const render = Render.create({
+    render = Render.create({
       element: document.body,
       engine: engine,
       options: {
         width: Config.world.window_size_x,
         height: Config.world.window_size_y,
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
         wireframes: false,
         background: 'black',
       }
@@ -202,14 +274,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Config.container_circle.create_second_layer) {
 
       var second_layer = static_circle(
-        centerX = Config.container_circle.centerX ,
-        centerY = Config.container_circle.centerY,
-        radius=Config.container_circle.radius * 1.5,
-        wallThickness=Config.container_circle.wallThickness,
-        numSegments=Config.container_circle.numSegments *1.5,
-        rotation_speed=-Config.container_circle.rotation_speed,
-        is_rotating=Config.container_circle.is_rotating,
-        color=Config.container_circle.color,
+        Config.container_circle.centerX,
+        Config.container_circle.centerY,
+        Config.container_circle.radius * 1.5,
+        Config.container_circle.wallThickness,
+        Config.container_circle.numSegments * 1.5,
+        -Config.container_circle.rotation_speed,
+        Config.container_circle.is_rotating,
+        Config.container_circle.color,
       );
       last_layer = second_layer;
       var growth_radius = Config.container_circle.radius * 1.5;
@@ -222,14 +294,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (Config.container_circle.create_third_layer) {
       
       var third_layer= static_circle(
-        centerX = Config.container_circle.centerX ,
-        centerY = Config.container_circle.centerY,
-        radius=Config.container_circle.radius * 1.95,
-        wallThickness=Config.container_circle.wallThickness,
-        numSegments=Config.container_circle.numSegments *2,
-        rotation_speed=Config.container_circle.rotation_speed,
-        is_rotating=Config.container_circle.is_rotating,
-        color=Config.container_circle.color,
+        Config.container_circle.centerX,
+        Config.container_circle.centerY,
+        Config.container_circle.radius * 1.95,
+        Config.container_circle.wallThickness,
+        Config.container_circle.numSegments * 2,
+        Config.container_circle.rotation_speed,
+        Config.container_circle.is_rotating,
+        Config.container_circle.color,
       );
       last_layer = third_layer;
       var growth_radius = Config.container_circle.radius * 1.95;
@@ -242,28 +314,35 @@ document.addEventListener("DOMContentLoaded", () => {
     var ball_list = [];
     var beep_list = [];
 
-    document.addEventListener("click", () => {
+    clickHandler = () => {
       smallBall = create_ball();
       ball_list.push(smallBall);
 
       Body.applyForce(smallBall, smallBall.position, Config.smallBall.initial_force);
 
-    }, { once: !Config.mode.allow_multiple_balls_on_click});
+      if (!Config.smallBall.allow_multiple_balls_on_click) {
+        document.removeEventListener("click", clickHandler);
+        clickHandler = null;
+      }
+    };
+    document.addEventListener("click", clickHandler);
 
 
     let hasCollided = false;
-    Events.on(engine, 'collisionStart', function (event) {
+    collisionStartHandler = function (event) {
       event.pairs.forEach(pair => {
-        
-        if (Config.sound.beep_on_collision) {
-          b=beep();
-          beep_list.push(b); 
+        const ballInPair = smallBall && (pair.bodyA === smallBall || pair.bodyB === smallBall);
+        if (!ballInPair) {
+          return;
         }
 
-        //Paint on Collision Mode
-        if (Config.mode.paint_on_collision) {
+        const b = beep();
+        beep_list.push(b);
 
-          if (Config.mode.destroy_where_touched){
+        //Paint on Collision Mode
+        if (Config.smallBall.paint_on_collision) {
+
+          if (Config.smallBall.destroy_where_touched){
             if (ball_list.includes(pair.bodyA) && !(last_layer.includes(pair.bodyB )) && !(ball_list.includes(pair.bodyB))  ) {
               World.remove(world, pair.bodyB);
             }
@@ -273,21 +352,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
           }
 
-          if (pair.bodyA === smallBall && !(Config.mode.paint_random_color)) {
-            pair.bodyB.render.fillStyle = Config.mode.paint_color;
-          }
-          else if (pair.bodyB === smallBall && !(Config.mode.paint_random_color)) {
-            pair.bodyA.render.fillStyle =  Config.mode.paint_color;
-          }
-          
-          if (pair.bodyA === smallBall && (Config.mode.paint_random_color)) {
-            pair.bodyB.render.fillStyle = `rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`;
-          }
-          else if (pair.bodyB === smallBall && (Config.mode.paint_random_color)) {
-            pair.bodyA.render.fillStyle = `rgb(${Common.random(0,255)},${Common.random(0, 255)},${Common.random(0, 255)})`;
-          }
-
-
+          const touchedBody = pair.bodyA === smallBall ? pair.bodyB : pair.bodyA;
+          touchedBody.render.fillStyle = "rgb(255,0,0)";
 
            
           
@@ -297,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         
           //Clears the scene
-          if (allPainted == true && Config.mode.clear_the_scene == true){
+          if (allPainted && Config.smallBall.clear_the_scene){
 
             ball_list.forEach(element => {
               World.remove(world,element);
@@ -307,12 +373,12 @@ document.addEventListener("DOMContentLoaded", () => {
               element.pause();
             });
 
-            last_layer.forEach(element => {
-              element.render.fillStyle = 'white';
+            [static_circle_elems, second_layer, third_layer].flat().forEach(element => {
+              element.render.fillStyle = "white";
             });
           }
 
-          if (allPainted == false && Config.mode.destroy_if_all_red == true) {
+          if (allPainted && Config.smallBall.destroy_if_all_red) {
             static_circle_elems.forEach(element => {
               World.remove(world,element)
             });
@@ -326,54 +392,51 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        if (pair.bodyA === smallBall || pair.bodyB === smallBall) {
-          if (!hasCollided) {
+        if (!hasCollided) {
 
-            //New ball on collision mode (not working so great :/ )
-            if (Config.mode.new_ball_on_collision == true){
-              new_ball = create_ball();
-              Body.applyForce(new_ball, new_ball.position, { x: 0.01, y: -0.01 });
+          //New ball on collision mode (not working so great :/ )
+          if (Config.smallBall.new_ball_on_collision){
+            const newBall = create_ball();
+            Body.applyForce(newBall, newBall.position, { x: 0.01, y: -0.01 });
 
-            }
-
-
-            //Grow on collision Mode
-            if (Config.mode.grow_on_collision == true){
-              if (smallBall.area < 3*(growth_radius*growth_radius) ) {//it is buggy (growth radius check dont work!) 
-                Body.scale(smallBall, Config.mode.growth_scale, Config.mode.growth_scale);
-                console.log("a");
-
-              }
-            }
-
-            hasCollided = true;
           }
+
+
+          //Grow on collision Mode
+          if (Config.smallBall.grow_on_collision){
+            if (smallBall.area < 3*(growth_radius*growth_radius) ) {//it is buggy (growth radius check dont work!)
+              Body.scale(smallBall, Config.smallBall.growth_scale, Config.smallBall.growth_scale);
+            }
+          }
+
+          hasCollided = true;
         }
       });
-    });
+    };
+    Events.on(engine, 'collisionStart', collisionStartHandler);
 
-    Events.on(engine, 'collisionEnd', function (event) {
+    collisionEndHandler = function (event) {
       event.pairs.forEach(pair => {
-        if (pair.bodyA === smallBall || pair.bodyB === smallBall) {
+        if (smallBall && (pair.bodyA === smallBall || pair.bodyB === smallBall)) {
           hasCollided = false;
         }
       });
-    });
+    };
+    Events.on(engine, 'collisionEnd', collisionEndHandler);
 
-    Events.on(engine, 'afterUpdate', function() {
-      if (typeof smallBall !== 'undefined' && Config.camera.camera_focus) {
+    afterUpdateHandler = function() {
+      if (smallBall && Config.smallBall.camera_focus) {
 
         const targetX = smallBall.position.x - render.options.width / 2;
         const targetY = smallBall.position.y - render.options.height / 2;
 
         Bounds.shift(render.bounds, { x: targetX, y: targetY });
       }
-    });
+    };
+    Events.on(engine, 'afterUpdate', afterUpdateHandler);
 
-    Render.run(render);
-
-    const runner = Runner.create();
-    Runner.run(runner, engine);
+    runner = Runner.create();
+    startMatter();
 
   }
 });

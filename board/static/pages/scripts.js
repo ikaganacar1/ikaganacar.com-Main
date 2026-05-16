@@ -35,6 +35,7 @@ try {
     options: {
       width: window.innerWidth,
       height: window.innerHeight,
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       wireframes: false,
       background: 'transparent',
       wireframeBackground: 'transparent'
@@ -47,14 +48,14 @@ try {
   if (ratio < 1) {
     ratio = 1
   }
-  console.log(ratio)
 
   var circle_array = []
+  const MAX_CIRCLES = 250
   function create_circles (x, y, color, apply_force) {
     if (color == 'gray') {
       /*let gray = Common.random(0,255);
       var curr_color = `rgb(${gray},${gray},${gray})`*/
-      colors = ['#D6E6F2', '#B9D7EA', '#769FCD'] // Switched to the blue tones
+      const colors = ['#D6E6F2', '#B9D7EA', '#769FCD'] // Switched to the blue tones
       var curr_color = Common.choose(colors)
     } else {
       var curr_color = `rgb(${Common.random(0, 255)},${Common.random(
@@ -96,6 +97,9 @@ try {
 
     Composite.add(world, circles)
     circle_array.push(circles)
+    if (circle_array.length > MAX_CIRCLES) {
+      Composite.remove(world, circle_array.shift())
+    }
     //setTimeout(function(){Composite.remove(world,circles);},1000);
   }
 
@@ -103,10 +107,13 @@ try {
     for (let i = 0; i < circle_array.length; i++) {
       Composite.remove(iEngine.world, circle_array[i])
     }
+    circle_array = []
   }
 
   var j = 0
   function color_obj (el) {
+    if (circle_array.length === 0) return
+
     setTimeout(() => {
       circle_array[j].render.fillStyle = `rgb(${Common.random(
         0,
@@ -135,7 +142,6 @@ try {
       default:
         break
     }
-    console.log(mode)
   }
 
   var i = 1
@@ -303,7 +309,7 @@ try {
       }
     )
 
-    link0 = Constraint.create({
+    const link0 = Constraint.create({
       pointA: { x: window.innerWidth * 0.9, y: 0 },
       bodyB: button_party_obj,
       stiffness: 0.1,
@@ -316,7 +322,7 @@ try {
       }
     })
 
-    link1 = Constraint.create({
+    const link1 = Constraint.create({
       bodyA: button_party_obj,
       bodyB: button_color_obj,
       stiffness: 0.1,
@@ -328,7 +334,7 @@ try {
       }
     })
 
-    link2 = Constraint.create({
+    const link2 = Constraint.create({
       bodyA: button_color_obj,
       bodyB: button_gravity_obj,
       stiffness: 0.1,
@@ -340,7 +346,7 @@ try {
       }
     })
 
-    link3 = Constraint.create({
+    const link3 = Constraint.create({
       bodyA: button_gravity_obj,
       bodyB: button_del_obj,
       stiffness: 0.1,
@@ -352,7 +358,7 @@ try {
       }
     })
 
-    link4 = Constraint.create({
+    const link4 = Constraint.create({
       bodyA: button_del_obj,
       bodyB: button_refresh_page,
       stiffness: 0.1,
@@ -398,7 +404,6 @@ try {
           },
           true
         )
-        console.log(v)
 
         //Body.setMass(v,1);
         if (i == 2) {
@@ -503,7 +508,6 @@ try {
   ;(function rerender () {
     link_button.render()
     title_box.render()
-    Matter.Engine.update(iEngine)
     requestAnimationFrame(rerender)
   })()
 
@@ -605,7 +609,7 @@ try {
       }
     })
 
-    link0 = Constraint.create({
+    const link0 = Constraint.create({
       pointA: { x: window.innerWidth * 0.1, y: 0 },
       bodyB: button_github,
       stiffness: 0.1,
@@ -618,7 +622,7 @@ try {
       }
     })
 
-    link1 = Constraint.create({
+    const link1 = Constraint.create({
       bodyA: button_github,
       bodyB: button_instagram,
       stiffness: 0.1,
@@ -630,7 +634,7 @@ try {
       }
     })
 
-    link2 = Constraint.create({
+    const link2 = Constraint.create({
       bodyA: button_instagram,
       bodyB: button_x,
       stiffness: 0.1,
@@ -642,7 +646,7 @@ try {
       }
     })
 
-    link3 = Constraint.create({
+    const link3 = Constraint.create({
       bodyA: button_x,
       bodyB: button_linkedin,
       stiffness: 0.1,
@@ -654,7 +658,7 @@ try {
       }
     })
 
-    link4 = Constraint.create({
+    const link4 = Constraint.create({
       bodyA: button_linkedin,
       bodyB: button_mail,
       stiffness: 0.1,
@@ -690,6 +694,17 @@ try {
   Matter.World.add(world, mouseConstraint)
   iRender.mouse = mouse
 
+  function releaseMouseConstraint () {
+    mouse.button = -1
+    mouseConstraint.bodyB = null
+    mouseConstraint.constraint.bodyB = null
+    mouseConstraint.constraint.pointB = { x: 0, y: 0 }
+  }
+
+  window.addEventListener('pageshow', releaseMouseConstraint)
+  window.addEventListener('pagehide', releaseMouseConstraint)
+  window.addEventListener('blur', releaseMouseConstraint)
+
   //event detections
   let check_if_clicked = false
   Events.on(mouseConstraint, 'mousedown', function (event) {
@@ -699,11 +714,10 @@ try {
     var bodies = world.bodies
 
     if (!mc.bodyB) {
-      for (i = 0; i < bodies.length; i++) {
+      for (let i = 0; i < bodies.length; i++) {
         var body = bodies[i]
         if (Matter.Bounds.contains(body.bounds, mc.mouse.position)) {
           var bodyUrl = body.url
-          console.log('Body.Url >> ' + bodyUrl)
 
           if (bodyUrl == 'del_obj') {
             del_obj()
@@ -723,9 +737,9 @@ try {
           } else if (bodyUrl == 'ika') {
             check_if_clicked = false
           } else if (bodyUrl != undefined) {
+            releaseMouseConstraint()
             window.open(bodyUrl, '_self')
             check_if_clicked = false
-            console.log('Hyperlink was opened')
           }
 
           break
@@ -752,8 +766,31 @@ try {
   create_env_interaction_buttons()
   create_social_buttons()
 
-  Render.run(iRender)
-  Runner.run(iRunner, iEngine)
+  let matterActive = false
+  function startMatter () {
+    if (matterActive) return
+    Render.run(iRender)
+    Runner.run(iRunner, iEngine)
+    matterActive = true
+  }
+
+  function stopMatter () {
+    if (!matterActive) return
+    Render.stop(iRender)
+    Runner.stop(iRunner)
+    matterActive = false
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      releaseMouseConstraint()
+      stopMatter()
+    } else {
+      startMatter()
+    }
+  })
+
+  startMatter()
 } catch (e) {
-  console.log(e)
+  console.error(e)
 } //global try catch to see the errors

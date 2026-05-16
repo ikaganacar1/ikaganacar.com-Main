@@ -52,7 +52,6 @@ input_.addEventListener("input", () => {
     }*/
 
   hash(txt).then((hex) => {
-    console.log(list[timestamp], hex);
     if (list[timestamp] == hex) {
       window.alert(
         "Congratulations! You have been succeeded.\n Tell the creator of this mess what you found in the book."

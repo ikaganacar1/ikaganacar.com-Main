@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='pages/admin/panel.css')}}">
-    
-    <script>
-        function toggleCollapse(element) {
-            const parentTr = element.closest('tr');
-            parentTr.classList.toggle('collapsed');
-        }
-    </script>
+    <script src="{{ url_for('static', filename='pages/admin/panel.js') }}" defer></script>
 </head>
 <body>
 
@@ -58,7 +52,7 @@
             <td>{{ history.page_name }}</td>
             <td>{{ history.visit_count }}</td>
             <td>
-                <span class="collapse-toggle" onclick="toggleCollapse(this)">Show/Hide Visits</span>
+                <button class="collapse-toggle" type="button">Show/Hide Visits</button>
                 <ul>
                     {% for visit in history.visits %}
                     <li>{{ visit.date }} - {{ visit.ip_address }}</li>

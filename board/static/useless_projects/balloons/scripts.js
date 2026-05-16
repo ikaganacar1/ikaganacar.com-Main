@@ -16,8 +16,6 @@ try {
     Common = Matter.Common,
     Constraint = Matter.Constraint,
     Mouse = Matter.Mouse,
-    Svg = Matter.Svg,
-    World = Matter.World,
     Events = Matter.Events
   //Composites = Matter.Composites,
   //Vector= Matter.Vector,
@@ -35,6 +33,7 @@ try {
     options: {
       width: window.innerWidth,
       height: window.innerHeight,
+      pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
       wireframes: false,
       background: 'transparent',
       wireframeBackground: 'transparent'
@@ -53,6 +52,17 @@ try {
     }
   })
   Matter.World.add(world, mouseConstraint)
+
+  function releaseMouseConstraint () {
+    mouse.button = -1
+    mouseConstraint.bodyB = null
+    mouseConstraint.constraint.bodyB = null
+    mouseConstraint.constraint.pointB = { x: 0, y: 0 }
+  }
+
+  window.addEventListener('pageshow', releaseMouseConstraint)
+  window.addEventListener('pagehide', releaseMouseConstraint)
+  window.addEventListener('blur', releaseMouseConstraint)
 
   function create_walls () {
     const wall_bottom = Bodies.rectangle(
@@ -82,7 +92,6 @@ try {
   if (ratio < 1) {
     ratio = 1
   }
-  console.log(ratio)
 
   function create_balloons (x, y, num, slide_x, slide_y, obj2 = null) {
     let rect_list = []
@@ -248,7 +257,7 @@ try {
     }
 
     const head = Bodies.circle(x, y - 70, 30, headOptions)
-    chest = Bodies.rectangle(x, y, 60, 80, chestOptions)
+    const chest = Bodies.rectangle(x, y, 60, 80, chestOptions)
     chest.size = 40 // To determine overlap of goal
     const rightUpperArm = Bodies.rectangle(
       x + 40,
@@ -534,7 +543,7 @@ try {
     }
   })
 
-  balloon_cart = Body.create({
+  const balloon_cart = Body.create({
     parts: [bottom, left, right],
     frictionAir: 0.1
   })
@@ -608,7 +617,6 @@ try {
 
   ;(function rerender () {
     pull_down_button.render()
-    Matter.Engine.update(iEngine)
     requestAnimationFrame(rerender)
   })()
 
@@ -666,16 +674,12 @@ try {
     }
   })
 
-  console.log(
-    `balloon:${balloon_list[0].mass}\nballoon_cart:${balloon_cart.mass}\nleg1:${ragdoll.bodies[6].mass}\nleg2:${ragdoll.bodies[7].mass}`
-  )
-
   Events.on(mouseConstraint, 'mousedown', function (event) {
     var mc = event.source
     var bodies = world.bodies
 
     if (!mc.bodyB) {
-      for (i = 0; i < bodies.length; i++) {
+      for (let i = 0; i < bodies.length; i++) {
         var body = bodies[i]
         if (Matter.Bounds.contains(body.bounds, mc.mouse.position)) {
           if (body.url == 'cut') {
@@ -685,6 +689,7 @@ try {
               gravity = true
             }
           } else if (body.url != undefined) {
+            releaseMouseConstraint()
             window.open(body.url, '_self')
             check_if_clicked = false
           }
@@ -694,8 +699,31 @@ try {
     }
   })
 
-  Render.run(iRender)
-  Runner.run(iRunner, iEngine)
+  let matterActive = false
+  function startMatter () {
+    if (matterActive) return
+    Render.run(iRender)
+    Runner.run(iRunner, iEngine)
+    matterActive = true
+  }
+
+  function stopMatter () {
+    if (!matterActive) return
+    Render.stop(iRender)
+    Runner.stop(iRunner)
+    matterActive = false
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      releaseMouseConstraint()
+      stopMatter()
+    } else {
+      startMatter()
+    }
+  })
+
+  startMatter()
 } catch (e) {
-  console.log(e)
+  console.error(e)
 } //global try catch to see the errors

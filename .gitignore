@@ -3,8 +3,10 @@ receipts
 venv
 .venv
 site.db
+board/site.db
 secret_key.txt
 __pycache__
 temp
 migrations
 flask_session
+board/flask_session

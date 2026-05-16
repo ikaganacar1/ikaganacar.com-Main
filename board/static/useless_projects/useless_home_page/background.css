@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Karla|Space+Mono");
+
 html,
 body {
   height: 100%;
@@ -22,8 +24,6 @@ body {
 
   }
 }
-@import url("https://fonts.googleapis.com/css?family=Karla|Space+Mono");
-
 #howmuchmoneyleft_sign {
   position: absolute;
   color: #272626;
@@ -53,6 +53,20 @@ body {
 }
 
 #ika_sign {
+  position: absolute;
+  color: #272626;
+  font-size: 25px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Space Mono", monospace;
+  font-style: inherit;
+  transform-origin: center center;
+  background-color: transparent;
+}
+
+#reddot_sign {
   position: absolute;
   color: #272626;
   font-size: 25px;
@@ -170,6 +184,20 @@ body {
 
 }
 
+#reddot_link {
+  position: absolute;
+  color: #272626;
+  font-size: 25px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'VT323', monospace;
+  font-style: inherit;
+  transform-origin: center center;
+  background-color: transparent;
+}
+
 .b_table {
   width: 100%;
   /* Ensure it fills the parent (#sign1) */
@@ -254,6 +282,45 @@ body {
   position: absolute;
   /*animation: move 10s infinite linear;*/
   color: #ffffff;
+  white-space: nowrap;
+}
+
+.r_table {
+  width: 100%;
+  height: 100%;
+  background-color: #1c1c1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.r_monitor-wrapper {
+  width: 100%;
+  height: 100%;
+  background: #660000;
+  box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.r_monitor {
+  width: 90%;
+  height: 90%;
+  background-color: #111111;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: inset 0px 5px 10px 2px rgba(255, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.r_monitor p {
+  font-size: clamp(20px, 4vw, 48px);
+  position: absolute;
+  color: #ff3333;
   white-space: nowrap;
 }
 
