@@ -10,19 +10,34 @@ body {
 body {
   font-size: 20px;
   text-align: center;
-  /*background-color: #171717;*/
   line-height: 1.6;
   overflow: hidden;
-  background-color: #e5e5f7;
-  /*#e5e5f7*/
-  opacity: 0.8;
-  background-image: radial-gradient(#769fcd 1px, #f7fbfc 1px);
-  background-size: 10px 10px;
+  background-color: #0f1416;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 24% 18%, rgba(125, 211, 199, 0.14), transparent 30%),
+    radial-gradient(circle at 82% 78%, rgba(137, 168, 190, 0.12), transparent 28%);
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%;
+  color: #eef4f8;
 }
+
+body::before {
+  content: "ikaganacar.com";
+  position: fixed;
+  top: 18px;
+  left: 22px;
+  color: rgba(238, 244, 248, 0.62);
+  font-family: "VT323", monospace;
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
 @media (hover: none) {
   body {
-    background-image: radial-gradient(#769fcd8e 3px, #f7fbfc 3px);
-    background-size: 12px 12px;
+    background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%;
   }
 }
 
@@ -35,14 +50,17 @@ main {
   position: absolute;
   height: 80px;
   width: 140px;
-  color: #272626;
-  font-size: 100px;
+  color: rgba(238, 244, 248, 0.74);
+  font-size: clamp(22px, 4vw, 36px);
   user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Arial";
+  font-family: "VT323", monospace;
   font-style: inherit;
+  text-transform: lowercase;
+  letter-spacing: 0;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 #link_button {
@@ -60,9 +78,9 @@ main {
 }
 
 #link_button p {
-  margin: 0; /* Remove default margins */
-  padding: 0; /* Remove any padding that could affect centering */
-  line-height: 1; /* Keep line-height to ensure vertical centering */
-  text-align: center; /* Center text horizontally */
-  width: 100%; /* Ensure the <p> element spans the full width */
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  text-align: center;
+  width: 100%;
 }

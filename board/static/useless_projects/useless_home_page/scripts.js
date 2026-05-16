@@ -197,7 +197,7 @@ try {
         friction: 0.2,
         restitution: 1,
         render: {
-          fillStyle: '#B9D7EA',
+          fillStyle: '#d9e8e6',
           strokeStyle: 'gray',
           lineWidth: 2,
           opacity: 0.8
@@ -227,8 +227,8 @@ try {
 
         url: link,
         render: {
-          fillStyle: '#EBB55F',
-          strokeStyle: '#050321',
+          fillStyle: '#7dd3c7',
+          strokeStyle: '#153842',
           lineWidth: 5,
           opacity: 0.8
         }
@@ -270,6 +270,45 @@ try {
       document.getElementById(`${sign_tag}_p`).style.fontSize = '70px'
     }
     return [sign, link_button]
+  }
+
+  function create_orbit_button (button_tag, link) {
+    const size = ratio > 1 ? 58 : 72
+    const button = {
+      w: size,
+      h: size,
+      body: Bodies.rectangle(window.innerWidth / 2, window.innerHeight / 2, size, size, {
+        isStatic: true,
+        url: link,
+        render: {
+          fillStyle: '#7dd3c7',
+          strokeStyle: '#153842',
+          lineWidth: 4,
+          opacity: 0.92
+        }
+      }),
+      elem: document.querySelector(`#${button_tag}`),
+      render () {
+        const { x, y } = this.body.position
+        this.elem.style.top = `${y - this.h / 2}px`
+        this.elem.style.left = `${x - this.w / 2}px`
+        this.elem.style.transform = `rotate(${this.body.angle}rad)`
+        this.elem.style.width = `${this.w}px`
+        this.elem.style.height = `${this.h}px`
+      },
+      orbit () {
+        const time = performance.now() * 0.00028
+        const radiusX = Math.max(120, window.innerWidth * 0.34)
+        const radiusY = Math.max(90, window.innerHeight * 0.28)
+        Body.setPosition(this.body, {
+          x: window.innerWidth / 2 + Math.cos(time) * radiusX,
+          y: window.innerHeight / 2 + Math.sin(time) * radiusY
+        })
+      }
+    }
+
+    Composite.add(world, button.body)
+    return button
   }
 
   function create_apartment_page_sign (link_tag, link, link_x, link_y) {
@@ -393,8 +432,8 @@ try {
 
         url: link,
         render: {
-          fillStyle: '#EBB55F',
-          strokeStyle: '#050321',
+          fillStyle: '#7dd3c7',
+          strokeStyle: '#153842',
           lineWidth: 5,
           opacity: 0.8
         }
@@ -477,7 +516,7 @@ try {
     window.innerWidth - 150,
     window.innerHeight * 0.47,
     true,
-    0.4
+    0.28
   )
 
   const reddot = create_page_sign(
@@ -492,6 +531,8 @@ try {
     true,
     0.55
   )
+
+  const back = create_orbit_button('back_sign', '/')
 
   ;(function rerender () {
     money[0].render()
@@ -508,6 +549,9 @@ try {
 
     reddot[0].render()
     reddot[1].render()
+
+    back.orbit()
+    back.render()
 
     apartment[1].render()
 
@@ -526,8 +570,8 @@ try {
         restitution: 0,
         friction: 0.1,
         render: {
-          fillStyle: '#6256CA',
-          strokeStyle: '#86D293',
+          fillStyle: '#7dd3c7',
+          strokeStyle: '#d9e8e6',
           lineWidth: 5
         }
       }

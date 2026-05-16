@@ -51,17 +51,14 @@ try {
 
   var circle_array = []
   const MAX_CIRCLES = 250
+  const BALL_COLORS = ['#d9e8e6', '#9fb3c8', '#7dd3c7', '#89a8be', '#eaf2f1']
   function create_circles (x, y, color, apply_force) {
     if (color == 'gray') {
       /*let gray = Common.random(0,255);
       var curr_color = `rgb(${gray},${gray},${gray})`*/
-      const colors = ['#D6E6F2', '#B9D7EA', '#769FCD'] // Switched to the blue tones
-      var curr_color = Common.choose(colors)
+      var curr_color = Common.choose(BALL_COLORS)
     } else {
-      var curr_color = `rgb(${Common.random(0, 255)},${Common.random(
-        0,
-        255
-      )},${Common.random(0, 255)})`
+      var curr_color = Common.choose(BALL_COLORS)
     }
 
     //ratio = 1;
@@ -81,7 +78,7 @@ try {
         //url: '#',
         render: {
           fillStyle: curr_color,
-          strokeStyle: 'white',
+          strokeStyle: 'rgba(16, 19, 24, 0.55)',
           lineWidth: 2
         }
       }
@@ -115,10 +112,7 @@ try {
     if (circle_array.length === 0) return
 
     setTimeout(() => {
-      circle_array[j].render.fillStyle = `rgb(${Common.random(
-        0,
-        255
-      )},${Common.random(0, 255)},${Common.random(0, 255)})`
+      circle_array[j].render.fillStyle = Common.choose(BALL_COLORS)
       j++
       if (j < circle_array.length) {
         color_obj()
@@ -216,11 +210,14 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#7dd3c7',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture: 'https://media.publit.io/file/trash-svgrepo-com.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
@@ -236,12 +233,15 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#7dd3c7',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture:
               'https://media.publit.io/file/color-palette-svgrepo-com-1.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
@@ -257,11 +257,14 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#7dd3c7',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture: 'https://media.publit.io/file/gravity-svgrepo-com-1.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
@@ -277,12 +280,15 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#7dd3c7',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture:
               'https://media.publit.io/file/refresh-cw-alt-4-svgrepo-com.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
@@ -298,12 +304,15 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#7dd3c7',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture:
               'https://media.publit.io/file/party-horn-svgrepo-com-1.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
@@ -318,7 +327,7 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
@@ -330,7 +339,7 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
@@ -342,7 +351,7 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
@@ -354,7 +363,7 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
@@ -366,7 +375,7 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
@@ -382,7 +391,7 @@ try {
 
   function SVG_to_object () {
     var vertexSets = [],
-      color = Common.choose(['#222831'])
+      color = '#7dd3c7'
 
     $('#svg')
       .find('path')
@@ -399,7 +408,9 @@ try {
             //frictionAir:0.01,
             render: {
               fillStyle: color,
-              strokeStyle: color
+              strokeStyle: '#eaf2f1',
+              lineWidth: 1,
+              opacity: 0.92
             }
           },
           true
@@ -465,8 +476,8 @@ try {
         friction: 0.1,
         url: 'useless_projects',
         render: {
-          fillStyle: '#EBB55F',
-          strokeStyle: '#050321',
+          fillStyle: '#7dd3c7',
+          strokeStyle: '#153842',
           lineWidth: 5,
           opacity: 0.8
         }
@@ -529,54 +540,22 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#9fb3c8',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture: 'https://media.publit.io/file/github-svgrepo-com.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
     )
-
-    var button_instagram = Bodies.circle(
-      50,
-      150 * button_ratio,
-      30 * button_ratio,
-      {
-        isStatic: false,
-        url: 'https://www.instagram.com/ikaganacar/',
-        restitution: 0.25,
-        friction: 0.1,
-        render: {
-          lineWidth: 2,
-          sprite: {
-            texture: 'https://media.publit.io/file/instagram-svgrepo-com-1.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
-          }
-        }
-      }
-    )
-
-    var button_x = Bodies.circle(50, 250 * button_ratio, 30 * button_ratio, {
-      isStatic: false,
-      url: 'https://x.com/ikaganacar',
-      restitution: 0.25,
-      friction: 0.1,
-      render: {
-        lineWidth: 2,
-        sprite: {
-          texture: 'https://media.publit.io/file/twitter-svgrepo-com-1.png',
-          xScale: 0.2083 * button_ratio,
-          yScale: 0.2083 * button_ratio
-        }
-      }
-    })
 
     var button_linkedin = Bodies.circle(
       50,
-      350 * button_ratio,
+      180 * button_ratio,
       30 * button_ratio,
       {
         isStatic: false,
@@ -584,27 +563,33 @@ try {
         restitution: 0.25,
         friction: 0.1,
         render: {
-          lineWidth: 2,
+          fillStyle: '#f7fbfc',
+          strokeStyle: '#9fb3c8',
+          lineWidth: 3,
+          opacity: 0.96,
           sprite: {
             texture: 'https://media.publit.io/file/linkedin-svgrepo-com-1.png',
-            xScale: 0.2083 * button_ratio,
-            yScale: 0.2083 * button_ratio
+            xScale: 0.135 * button_ratio,
+            yScale: 0.135 * button_ratio
           }
         }
       }
     )
 
-    var button_mail = Bodies.circle(50, 450 * button_ratio, 30 * button_ratio, {
+    var button_mail = Bodies.circle(50, 310 * button_ratio, 30 * button_ratio, {
       isStatic: false,
       url: 'mailto:acarismailkagan@gmail.com',
       restitution: 0.25,
       friction: 0.1,
       render: {
-        lineWidth: 2,
+        fillStyle: '#f7fbfc',
+        strokeStyle: '#9fb3c8',
+        lineWidth: 3,
+        opacity: 0.96,
         sprite: {
           texture: 'https://media.publit.io/file/mail-alt-3-svgrepo-com.png',
-          xScale: 0.2083 * button_ratio,
-          yScale: 0.2083 * button_ratio
+          xScale: 0.135 * button_ratio,
+          yScale: 0.135 * button_ratio
         }
       }
     })
@@ -618,47 +603,23 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
     const link1 = Constraint.create({
       bodyA: button_github,
-      bodyB: button_instagram,
-      stiffness: 0.1,
-      render: {
-        lineWidth: 1,
-        type: 'line',
-        anchors: false,
-        strokeStyle: '#393E46'
-      }
-    })
-
-    const link2 = Constraint.create({
-      bodyA: button_instagram,
-      bodyB: button_x,
-      stiffness: 0.1,
-      render: {
-        lineWidth: 1,
-        type: 'line',
-        anchors: false,
-        strokeStyle: '#393E46'
-      }
-    })
-
-    const link3 = Constraint.create({
-      bodyA: button_x,
       bodyB: button_linkedin,
       stiffness: 0.1,
       render: {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
-    const link4 = Constraint.create({
+    const link2 = Constraint.create({
       bodyA: button_linkedin,
       bodyB: button_mail,
       stiffness: 0.1,
@@ -666,15 +627,13 @@ try {
         lineWidth: 1,
         type: 'line',
         anchors: false,
-        strokeStyle: '#393E46'
+        strokeStyle: 'rgba(238, 244, 248, 0.36)'
       }
     })
 
-    World.add(world, [link0, link1, link2, link3, link4])
+    World.add(world, [link0, link1, link2])
     World.add(world, [
       button_github,
-      button_instagram,
-      button_x,
       button_linkedin,
       button_mail
     ])

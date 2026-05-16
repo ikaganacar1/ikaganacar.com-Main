@@ -1,13 +1,21 @@
 function copyToClipboard (elementId) {
   const textToCopy = document.getElementById(elementId).innerText
+  const status = document.querySelector('.copy-status')
+  const showStatus = message => {
+    if (status) {
+      status.innerText = message
+    }
+  }
+
   if (navigator.clipboard) {
     navigator.clipboard
       .writeText(textToCopy)
       .then(() => {
-        alert('Copied to clipboard: ' + textToCopy)
+        showStatus('Copied to clipboard')
       })
       .catch(err => {
         console.error('Could not copy text: ', err)
+        showStatus('Could not copy automatically')
       })
     return
   }
@@ -21,7 +29,7 @@ function copyToClipboard (elementId) {
   textarea.select()
   document.execCommand('copy')
   document.body.removeChild(textarea)
-  alert('Copied to clipboard: ' + textToCopy)
+  showStatus('Copied to clipboard')
 }
 
 document.addEventListener('DOMContentLoaded', function () {

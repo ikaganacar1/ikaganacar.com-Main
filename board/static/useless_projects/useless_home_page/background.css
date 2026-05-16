@@ -12,16 +12,32 @@ body {
   text-align: center;
   line-height: 1.6;
   overflow: hidden;
-  background-color: #e5e5f7;
-  opacity: 0.8;
-  background-image: radial-gradient(#769FCD 1px, #F7FBFC 1px);
-  background-size: 10px 10px;
+  background-color: #0f1416;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 15% 24%, rgba(125, 211, 199, 0.13), transparent 30%),
+    radial-gradient(circle at 80% 76%, rgba(137, 168, 190, 0.13), transparent 28%);
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%;
+  color: #eef4f8;
 }
+
+body::before {
+  content: "useless projects";
+  position: fixed;
+  top: 18px;
+  left: 22px;
+  color: rgba(238, 244, 248, 0.62);
+  font-family: "VT323", monospace;
+  font-size: clamp(24px, 3.2vw, 38px);
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
 @media (hover: none) {
   body {
-      background-image: radial-gradient(#769fcd8e 3px, #F7FBFC 3px);
-      background-size: 12px 12px;
-
+      background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%;
   }
 }
 #howmuchmoneyleft_sign {
@@ -119,7 +135,7 @@ body {
   font-size: 50px;
   position: absolute;
   animation: move 10s infinite linear;
-  color: #EBB55F;
+  color: #7dd3c7;
   white-space: nowrap;
 }
 
@@ -203,7 +219,7 @@ body {
   /* Ensure it fills the parent (#sign1) */
   height: 100%;
   /* Ensure it fills the parent (#sign1) */
-  background-color: #6256CA;
+  background-color: #1d4f5f;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -212,7 +228,7 @@ body {
 .b_monitor-wrapper {
   width: 100%;
   height: 100%;
-  background: #86D293;
+  background: #7dd3c7;
   box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
@@ -222,7 +238,7 @@ body {
 .b_monitor {
   width: 90%;
   height: 90%;
-  background-color: #C1E2A4;
+  background-color: #d9e8e6;
   overflow: hidden;
   white-space: nowrap;
   box-shadow: inset 0px 5px 10px 2px rgba(0, 0, 0, 0.3);
@@ -236,7 +252,7 @@ body {
   font-size: 50px;
   position: absolute;
   /*animation: move 10s infinite linear;*/
-  color: #6256CA;
+  color: #153842;
   white-space: nowrap;
 }
 
@@ -267,7 +283,7 @@ body {
 .i_monitor {
   width: 90%;
   height: 90%;
-  background-color: #b8001f98;
+  background-color: #22343d;
   overflow: hidden;
   white-space: nowrap;
   box-shadow: inset 0px 5px 10px 2px rgba(0, 0, 0, 0.3);
@@ -338,6 +354,17 @@ body {
   background-color: transparent;
 }
 
+#back_sign {
+  position: absolute;
+  color: #272626;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  background-color: transparent;
+}
+
 
 #donation_link {
   position: absolute;
@@ -378,7 +405,7 @@ body {
 .d_monitor {
   width: 90%;
   height: 90%;
-  background-color: #e1ff0098;
+  background-color: #d9e8e6;
   overflow: hidden;
   white-space: nowrap;
   box-shadow: inset 0px 5px 10px 2px rgba(255, 255, 255, 0.3);
@@ -389,10 +416,51 @@ body {
 }
 
 .d_monitor p {
-  font-size: 25px;
+  font-size: clamp(12px, 2.6vw, 20px);
   position: absolute;
   color: #ffffff;
   white-space: nowrap;
+}
+
+.back_button_face {
+  width: 100%;
+  height: 100%;
+  background-color: #1d4f5f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.back_home_icon {
+  width: 44%;
+  height: 34%;
+  border: 4px solid #d9e8e6;
+  border-top: 0;
+  position: relative;
+  transform: translateY(8px);
+}
+
+.back_home_icon::before {
+  content: "";
+  position: absolute;
+  width: 72%;
+  height: 72%;
+  border-left: 4px solid #d9e8e6;
+  border-top: 4px solid #d9e8e6;
+  left: 10%;
+  top: -62%;
+  transform: rotate(45deg);
+}
+
+.back_home_icon::after {
+  content: "";
+  position: absolute;
+  width: 22%;
+  height: 45%;
+  left: 39%;
+  bottom: -4px;
+  background: #d9e8e6;
 }
 
 #apartment_link {
@@ -410,4 +478,67 @@ body {
   transform-origin: center center;
   background-color: transparent;
 
+}
+
+#howmuchmoneyleft_sign,
+#balloon_sign,
+#ika_sign,
+#reddot_sign,
+#donation_sign,
+#back_sign {
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.32));
+}
+
+.table,
+.b_table,
+.i_table,
+.r_table,
+.d_table {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.back_button_face {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.monitor-wrapper,
+.b_monitor-wrapper,
+.i_monitor-wrapper,
+.r_monitor-wrapper,
+.d_monitor-wrapper {
+  box-shadow: inset 0 0 0 2px rgba(16, 19, 24, 0.2), 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.back_button_face {
+  box-shadow: inset 0 0 0 2px rgba(16, 19, 24, 0.2), 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.monitor,
+.b_monitor,
+.i_monitor,
+.r_monitor,
+.d_monitor {
+  border-radius: 3px;
+}
+
+.monitor p,
+.b_monitor p,
+.i_monitor p,
+.r_monitor p,
+.d_monitor p {
+  margin: 0;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.b_monitor p,
+.i_monitor p {
+  font-size: clamp(24px, 5vw, 50px);
+}
+
+.d_monitor p {
+  color: #153842;
 }
