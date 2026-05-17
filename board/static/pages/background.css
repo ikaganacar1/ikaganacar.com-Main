@@ -8,6 +8,7 @@ body {
 }
 
 body {
+  position: relative;
   font-size: 20px;
   text-align: center;
   line-height: 1.6;
@@ -32,6 +33,27 @@ body::before {
   font-size: clamp(22px, 3vw, 34px);
   line-height: 1;
   pointer-events: none;
+  z-index: 1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  width: min(58vw, 720px);
+  height: min(38vw, 430px);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle, rgba(125, 211, 199, 0.16), transparent 58%),
+    radial-gradient(circle, rgba(159, 179, 200, 0.1), transparent 68%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+canvas {
+  position: relative;
   z-index: 1;
 }
 
@@ -61,11 +83,12 @@ main {
   text-transform: lowercase;
   letter-spacing: 0;
   text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  z-index: 2;
 }
 
 #link_button {
   position: absolute;
-  color: #272626;
+  color: #12313a;
   font-size: 40px;
   user-select: none;
   display: flex;
@@ -75,6 +98,7 @@ main {
   font-style: inherit;
   transform-origin: center center;
   background-color: transparent;
+  z-index: 2;
 }
 
 #link_button p {
